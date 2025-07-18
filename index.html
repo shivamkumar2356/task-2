@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StopWatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #0f172a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            margin-bottom: 20px;
+        }
+
+        .watch {
+            border: 10px solid #334155;
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1e293b;
+        }
+
+        .inner-circle {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .buttons {
+            margin: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .playbtn.play {
+            background-color: #22c55e; 
+        }
+
+        .playbtn.pause {
+            background-color: #ef4444; 
+        }
+
+        .playbtn.play:hover {
+            background-color: #16a34a;
+        }
+
+        .playbtn.pause:hover {
+            background-color: #dc2626;
+        }
+
+        .resetbtn {
+            background-color: #3b82f6; 
+        }
+
+        .resetbtn:hover {
+            background-color: #2563eb;
+        }
+
+        .lapbtn {
+            background-color: #eab308; 
+            color: black;
+        }
+
+        .lapbtn:hover {
+            background-color: #ca8a04;
+        }
+
+        .visibility {
+            display: none;
+        }
+
+        .laps {
+            list-style: none;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .laps li {
+            padding: 5px 10px;
+            background: #334155;
+            margin: 3px 0;
+            border-radius: 4px;
+        }
+
+        .clearbtn {
+            margin-top: 10px;
+            background-color: #ef4444;
+        }
+
+        .clearbtn:hover {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="watch">
+            <div class="inner-circle">
+                <span class="min">00 :</span>
+                <span class="sec">00 :</span>
+                <span class="msec">00</span>
+            </div>
+        </div>
+    </div>
+    <div class="buttons">
+        <button class="resetbtn btn visibility">Reset</button>
+        <button class="playbtn btn play">Play</button>
+        <button class="lapbtn btn visibility">Lap</button>
+    </div>
+    <ul class="laps"></ul>
+    <button class="clearbtn btn visibility">Clear</button>
+
+    <script>
+        let min = 0, sec = 0, msec = 0, interval;
+        const minDisplay = document.querySelector('.min');
+        const secDisplay = document.querySelector('.sec');
+        const msecDisplay = document.querySelector('.msec');
+        const playBtn = document.querySelector('.playbtn');
+        const resetBtn = document.querySelector('.resetbtn');
+        const lapBtn = document.querySelector('.lapbtn');
+        const clearBtn = document.querySelector('.clearbtn');
+        const laps = document.querySelector('.laps');
+
+        function updateDisplay() {
+            minDisplay.textContent = `${String(min).padStart(2, '0')} :`;
+            secDisplay.textContent = `${String(sec).padStart(2, '0')} :`;
+            msecDisplay.textContent = `${String(Math.floor(msec / 10)).padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            interval = setInterval(() => {
+                msec += 10;
+                if (msec === 1000) {
+                    msec = 0;
+                    sec++;
+                }
+                if (sec === 60) {
+                    sec = 0;
+                    min++;
+                }
+                updateDisplay();
+            }, 10);
+        }
+
+        function stopTimer() {
+            clearInterval(interval);
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (playBtn.textContent === 'Play') {
+                startTimer();
+                playBtn.textContent = 'Pause';
+                playBtn.classList.remove('play');
+                playBtn.classList.add('pause');
+                resetBtn.classList.remove('visibility');
+                lapBtn.classList.remove('visibility');
+            } else {
+                stopTimer();
+                playBtn.textContent = 'Play';
+                playBtn.classList.remove('pause');
+                playBtn.classList.add('play');
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            stopTimer();
+            min = 0; sec = 0; msec = 0;
+            updateDisplay();
+            playBtn.textContent = 'Play';
+            playBtn.classList.remove('pause');
+            playBtn.classList.add('play');
+            resetBtn.classList.add('visibility');
+            lapBtn.classList.add('visibility');
+            laps.innerHTML = '';
+            clearBtn.classList.add('visibility');
+        });
+
+        lapBtn.addEventListener('click', () => {
+            const lapTime = `${String(min).padStart(2, '0')} : ${String(sec).padStart(2, '0')} : ${String(Math.floor(msec / 10)).padStart(2, '0')}`;
+            const li = document.createElement('li');
+            li.textContent = lapTime;
+            laps.appendChild(li);
+            clearBtn.classList.remove('visibility');
+        });
+
+        clearBtn.addEventListener('click', () => {
+            laps.innerHTML = '';
+            clearBtn.classList.add('visibility');
+        });
+    </script>
+</body>
+
+</html>
